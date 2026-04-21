@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "title": "Classic White T-Shirt",
+    "price": 19.99,
+    "description": "Comfortable cotton t-shirt in white.",
+    "image": "/assets/images/image.jpg",
+    "inventory": 25
+  },
+  {
+    "id": 2,
+    "title": "Blue Denim Jeans",
+    "price": 49.99,
+    "description": "Slim fit blue denim jeans.",
+    "image": "/assets/images/image.jpg",
+    "inventory": 12
+  },
+  {
+    "id": 3,
+    "title": "Running Sneakers",
+    "price": 79.99,
+    "description": "Lightweight running shoes with cushioned sole.",
+    "image": "/assets/images/image.jpg",
+    "inventory": 8
+  }
+]

@@ -1,0 +1,43 @@
+@use '@angular/material' as mat;
+
+$black-palette: (
+  0: #000000,
+  10: #1a1a1a,
+  20: #2e2e2e,
+  25: #383838,
+  30: #444444,
+  35: #4f4f4f,
+  40: #5c5c5c,
+  50: #757575,
+  60: #909090,
+  70: #ababab,
+  80: #c6c6c6,
+  90: #e2e2e2,
+  95: #f0f0f0,
+  98: #f8f8f8,
+  99: #fbfbfb,
+  100: #ffffff,
+);
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: $black-palette,
+        tertiary: $black-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}
