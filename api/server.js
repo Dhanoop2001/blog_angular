@@ -3,10 +3,11 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const express = require('express');
 const { readFileSync } = require('fs');
-const { connect, ObjectId } = require('./db');
-const blogsRoutes = require('./routes/blogs.routes');
-const authRoutes = require('./routes/auth.routes');
-const { upload: multerUpload } = require('./utils/upload');
+const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
+const { MongoClient, ObjectId } = require('mongodb');
+const nodemailer = require('nodemailer');
+const multer = require('multer');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -28,11 +29,52 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'uploads')));
+const uploadDir = path.join(__dirname, '..', 'public', 'uploads');
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = crypto.randomBytes(16).toString('hex') + path.extname(file.originalname);
+    cb(null, uniqueName);
+  }
+});
 
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  }
+});
 
-let collections = null;
+app.use('/uploads', express.static(uploadDir));
+
+const productsPath = path.join(__dirname, '..', 'src', 'api', 'products.json');
+let products = [];
+
+try {
+  products = JSON.parse(readFileSync(productsPath, 'utf8'));
+  console.log(`Loaded ${products.length} products from products.json`);
+} catch (e) {
+  console.warn('Could not read products.json:', e?.message);
+}
+
+let usersCol = null;
+let sessionsCol = null;
+let resetsCol = null;
+let blogsCol = null;
+
+const hashPassword = (password) => bcrypt.hashSync(password, 12);
+
+function hashResetToken(rawToken) {
+  return crypto.createHash('sha256').update(rawToken, 'utf8').digest('hex');
+}
 
 function getGmailCredentials() {
   const user = process.env.GMAIL_USER?.trim();
